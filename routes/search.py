@@ -9,41 +9,9 @@ def search():
 
     if query.startswith("/weather") or query.startswith("/w"):
         print('weather')
-        return redirect(url_for('graph_bp.create_graph', q=query))
+        return redirect(url_for('graph_bp.create_weather_graph', q=query))
     else:
         return render_template('home.html', query=query, module='unknown')
-
-    # # Example logic — replace this with your real dispatcher
-    # if query.startswith("/weather"):
-    #     print(3)
-    #     return redirect(url_for('main.create_graph', q=query))
-    # else:
-    #     return render_template('home.html', query=query, module='unknown')
-
-# @main_bp.route('/app/create_graph', methods=['GET'])
-# def create_graph():
-#     query = request.args.get('q', '')
-#     page = int(request.args.get('page', 1))
-#     df = construct_dataframe(query)
-#     total_pages = (len(df) + 23) // 24
-#     graph_html = generate_paginated_graphs(df, page, 24)
-
-#     return render_template('home.html',
-#                            query=query,
-#                            page=page,
-#                            total_pages=total_pages,
-#                            module='graph',
-#                            graph_html=graph_html)
-
-# def construct_dataframe(query):
-#     # Mock example
-#     import numpy as np
-#     return pd.DataFrame({
-#         'x': list(range(96)),
-#         'y': np.random.rand(96)
-#     })
-
-
 
 # from flask import Blueprint, request, jsonify, Response
 # import os

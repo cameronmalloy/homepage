@@ -1,7 +1,16 @@
+import os
+import hashlib
+import time
+import json 
+import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
+from services.graph_metadata import GraphMetadata
 
-def generate_paginated_graphs(df, page=1, per_page=24):
+CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'graphs')
+CACHE_TTL = 3600  # 1 hour in seconds
+
+def generate_paginated_graphs(df, metadata, page=1, per_page=24):
     start = (page - 1) * per_page
     end = start + per_page
     sub_df = df.iloc[start:end]
@@ -19,20 +28,72 @@ def generate_paginated_graphs(df, page=1, per_page=24):
 
     return graph_html
 
+## the following is just to ensure we get the right dataframe
 
-# import os
+def ensure_data_directory():
+    """Ensure the graph data directory exists"""
+    os.makedirs(CACHE_DIR, exist_ok=True)
+
+def get_cache_filepath(query: str) -> str:
+    ensure_data_directory()
+    query_hash = hashlib.md5(str.lower(query).encode('utf-8')).hexdigest()
+    return os.path.join(CACHE_DIR, f"{query_hash}.json")
+
+def load_cached_dataframe(query: str):
+    """
+    Load a cached dataframe
+
+    Args:
+        query: query submitted by user
+
+    Returns:
+        Dictionary with success status, 
+    """
+
+    path = get_cache_filepath(query)
+    print(path)
+    if not os.path.exists(path):
+        print('cache did not exist')
+        return None, None
+
+    if time.time() - os.path.getmtime(path) > CACHE_TTL:
+        os.remove(path)
+        print('cache deleted')
+        return None, None
+
+    with open(path, 'r') as f:
+        json_data = json.load(f)
+
+    df = pd.DataFrame(json_data['data'])
+    metadata = GraphMetadata.from_dict(json_data['metadata'])
+    
+    print('loaded cached df')
+
+    return df, metadata
+
+def save_dataframe_cache(query: str, df: pd.DataFrame, metadata: GraphMetadata):
+    """
+    Caches a new DataFrame and GraphMetadata for a given query.
+    Overwrites any existing cache.
+    """
+    path = get_cache_filepath(query)
+
+    data = {
+        'data': df.to_dict(orient='records'),
+        'metadata': metadata.to_dict()
+    }
+
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2)
+        print(f'saved data to {path}')
+
+
+
 # import json
 # import uuid
 # import math
 # from datetime import datetime, timedelta
 # import random
-
-# # Path to store graph data
-# GRAPH_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'graphs')
-
-# def ensure_data_directory():
-#     """Ensure the graph data directory exists"""
-#     os.makedirs(GRAPH_DATA_DIR, exist_ok=True)
 
 # def create_graph(dataframe, config):
 #     """
