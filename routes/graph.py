@@ -1,73 +1,37 @@
-from flask import Blueprint, request, jsonify, Response
-import os
-import json
+from flask import Blueprint, render_template, request
+from services.graph_service import generate_paginated_graphs
+import pandas as pd
 
-# Import services
-from services.graph_service import create_graph, get_graph_data, create_example_graph
+graph_bp = Blueprint('graph_bp', __name__, url_prefix='/graph')
 
-# Create blueprint
-graph_bp = Blueprint('graph', __name__, url_prefix='/graph')
-
-@graph_bp.route('/example')
-def example():
-    """Create an example graph and return its ID"""
-    graph_id = create_example_graph()
-    if not graph_id:
-        return jsonify({"success": False, "error": "Failed to create example graph"}), 500
+@graph_bp.route('/create_graph', methods=['GET'])
+def create_graph():
+    query = request.args.get('q', '')
+    print('creating graph')
     
-    # Just return the graph_id so the frontend can use it
-    return Response(f'<div data-graph_id="{graph_id}"></div>', mimetype='text/html')
 
-# API endpoints
-@graph_bp.route('/api/create', methods=['POST'])
-def api_create_graph():
-    """
-    API endpoint to create a graph from a dataframe
-    
-    Expected JSON payload:
-    {
-        "dataframe": [{"col1": val1, "col2": val2, ...}, {...}],
-        "num_points": 24,
-        "height": 400,
-        "x_axis_label": "Time",
-        "y_axis_label": "Temperature (°C)",
-        "x_column": "timestamp",
-        "y_column": "temperature",
-        "titles": ["Day 1", "Day 2", "Day 3", "Day 4"],
-        "line_color": "#3366cc",
-        "line_width": 2,
-        "point_color": "#ff9900",
-        "point_size": 5
-    }
-    """
-    try:
-        data = request.get_json()
-        
-        if not data or 'dataframe' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Missing dataframe in request'
-            }), 400
-            
-        result = create_graph(data['dataframe'], data)
-        
-        if result['success']:
-            return jsonify(result)
-        else:
-            return jsonify(result), 400
-            
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+    page = int(request.args.get('page', 1))
+    df = construct_dataframe(query)
+    total_pages = (len(df) + 23) // 24
+    graph_html = generate_paginated_graphs(df, page, 24)
 
-@graph_bp.route('/api/data/<graph_id>/<int:page>')
-def api_get_graph_data(graph_id, page):
-    """Get data for a specific page of a graph"""
-    result = get_graph_data(graph_id, page)
+    # Save to file for debugging
+    # debug_dir = 'debug_graphs'
+    # os.makedirs(debug_dir, exist_ok=True)
+    # filepath = os.path.join(debug_dir, f'graph_page_{page}.html')
+    # with open(filepath, 'w', encoding='utf-8') as f:
+    #     f.write(graph_html)
     
-    if result['success']:
-        return jsonify(result)
-    else:
-        return jsonify(result), 404
+    return render_template('graph_module.html',
+                           query=query,
+                           page=page,
+                           total_pages=total_pages,
+                           graph_html=graph_html)
+
+def construct_dataframe(query):
+    # Mock example
+    import numpy as np
+    return pd.DataFrame({
+        'x': list(range(96)),
+        'y': np.random.rand(96)
+    })

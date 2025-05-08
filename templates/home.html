@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Viewer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+
+<!-- Search Bar -->
+<form action="/search" method="get">
+    <input type="text" name="q" value="{{ query | default('') }}" placeholder="Search..." required>
+    <button type="submit">Search</button>
+</form>
+
+<!-- Modular Content Area -->
+<div class="module-area">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
