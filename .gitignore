@@ -176,3 +176,5 @@ cython_debug/
 # data sciency stuff
 .DS_Store
 data/graphs/*
+data/testing/*
+data/*

@@ -8,11 +8,11 @@
 {% if total_pages > 1 %}
 <div class="pagination">
     {% if page > 1 %}
-        <a href="/graph/create_graph?q={{ query }}&page={{ page - 1 }}">← Previous</a>
+        <a href="/graph/weather?q={{ query }}&page={{ page - 1 }}">← Previous</a>
     {% endif %}
     <span>Page {{ page }} of {{ total_pages }}</span>
     {% if page < total_pages %}
-        <a href="/graph/create_graph?q={{ query }}&page={{ page + 1 }}">Next →</a>
+        <a href="/graph/weather?q={{ query }}&page={{ page + 1 }}">Next →</a>
     {% endif %}
 </div>
 {% endif %}

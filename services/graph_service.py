@@ -10,19 +10,41 @@ from services.graph_metadata import GraphMetadata
 CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'graphs')
 CACHE_TTL = 3600  # 1 hour in seconds
 
-def generate_paginated_graphs(df, metadata, page=1, per_page=24):
+def generate_paginated_graphs(df, metadata:GraphMetadata, page=1):
+    per_page = metadata.num_points
     start = (page - 1) * per_page
     end = start + per_page
     sub_df = df.iloc[start:end]
 
+    title = metadata.format_title(sub_df)
+    print(title)
+
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=sub_df['x'], y=sub_df['y'], mode='lines+markers', hoverinfo='x+y'))
+    fig.add_trace(go.Scatter(x=sub_df[metadata.x_axis],
+                             y=sub_df[metadata.y_axis],
+                             mode='lines+markers',
+                             hoverinfo='x+y'))
     fig.update_layout(
+        title=title,
         autosize=True,
         margin=dict(l=40, r=40, t=40, b=40),
         height=400,
         # responsive=True
     )
+    x_tick_labels = metadata.format_x_labels(sub_df)
+    if x_tick_labels:
+        fig.update_xaxes(
+            tickmode='array',
+            tickvals=sub_df[metadata.x_axis][::3],
+            ticktext=x_tick_labels[::3]
+        )
+    y_tick_labels = metadata.format_y_labels(sub_df)
+    if y_tick_labels:
+        fig.update_yaxes(
+            tickmode='array',
+            tickvals=sub_df[metadata.y_axis][::3],
+            ticktext=y_tick_labels[::3]
+        )
 
     graph_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False)
 

@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from dotenv import load_dotenv
 from routes.search import search_bp 
 from routes.graph import graph_bp
 
@@ -8,6 +9,9 @@ app = Flask(__name__)
 # Register all blueprints
 app.register_blueprint(search_bp)
 app.register_blueprint(graph_bp)
+
+# load environment variables
+load_dotenv()
 
 # Future: You can load config files, logging, or extensions here
 # app.config.from_pyfile('config.py')

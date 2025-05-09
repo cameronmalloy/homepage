@@ -1,0 +1,32 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<form method="GET" action="{{ url_for('graph_bp.create_weather_graph') }}">
+    <input type="hidden" name="q" value="{{ query }}">
+    <input type="hidden" name="page" value="{{ page }}">
+
+    <label for="metric">Select Metric:</label>
+    <select name="metric" id="metric" onchange="this.form.submit()">
+      <option value="temperature_2m" {% if metric == 'temperature_2m' %}selected{% endif %}>Temperature</option>
+      <option value="apparent_temperature" {% if metric == 'apparent_temperature' %}selected{% endif %}>Feels Like</option>
+      <option value="relative_humidity_2m" {% if metric == 'relative_humidity_2m' %}selected{% endif %}>Humidity</option>
+      <option value="precipitation" {% if metric == 'precipitation' %}selected{% endif %}>Precipitation</option>
+    </select>
+  </form>
+
+<div class="graph-container">
+    {{ graph_html | safe }}
+</div>
+
+{% if total_pages > 1 %}
+<div class="pagination">
+    {% if page > 1 %}
+        <a href="/graph/weather?q={{ query }}&page={{ page - 1 }}&metric={{ metric }}">← Previous</a>
+    {% endif %}
+    <span>Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+        <a href="/graph/weather?q={{ query }}&page={{ page + 1 }}&metric={{ metric }}">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
