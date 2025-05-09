@@ -5,7 +5,7 @@ import json
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
-from services.graph_metadata import GraphMetadata
+from services.graph_metadata import GraphMetadata, WeatherGraphMetadata
 
 CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'graphs')
 CACHE_TTL = 3600  # 1 hour in seconds
@@ -23,29 +23,41 @@ def generate_paginated_graphs(df, metadata:GraphMetadata, page=1):
     fig.add_trace(go.Scatter(x=sub_df[metadata.x_axis],
                              y=sub_df[metadata.y_axis],
                              mode='lines+markers',
-                             hoverinfo='x+y'))
-    fig.update_layout(
-        title=title,
-        autosize=True,
-        margin=dict(l=40, r=40, t=40, b=40),
-        height=400,
-        # responsive=True
-    )
+                             name=metadata.get_name(),
+                             line=dict(color=metadata.get_line_color()),
+                             marker=dict(color=metadata.get_line_color()),
+                             hoverinfo='x+y',
+                             showlegend=True))
+    
+    layout = metadata.layout_config()
+    layout["title"]["text"] = title 
+    print(layout["legend"])
+    # fig.update_layout(
+    #     title=title,
+    #     autosize=True,
+    #     margin=dict(l=40, r=40, t=40, b=40),
+    #     height=400,
+    #     # responsive=True
+    # )
     x_tick_labels = metadata.format_x_labels(sub_df)
     if x_tick_labels:
-        fig.update_xaxes(
-            tickmode='array',
-            tickvals=sub_df[metadata.x_axis][::3],
-            ticktext=x_tick_labels[::3]
-        )
+        layout["xaxis"]["ticktext"] = x_tick_labels[::3]
+        layout["xaxis"]["tickvals"] = sub_df[metadata.x_axis][::3]
+        # fig.update_xaxes(
+        #     tickmode='array',
+        #     tickvals=sub_df[metadata.x_axis][::3],
+        #     ticktext=x_tick_labels[::3]
+        # )
     y_tick_labels = metadata.format_y_labels(sub_df)
     if y_tick_labels:
-        fig.update_yaxes(
-            tickmode='array',
-            tickvals=sub_df[metadata.y_axis][::3],
-            ticktext=y_tick_labels[::3]
-        )
-
+        layout["yaxis"]["ticktext"] = y_tick_labels[::3]
+        layout["yaxis"]["tickvals"] = sub_df[metadata.y_axis][::3]
+        # fig.update_yaxes(
+        #     tickmode='array',
+        #     tickvals=sub_df[metadata.y_axis][::3],
+        #     ticktext=y_tick_labels[::3]
+        # )
+    fig.update_layout(**layout)
     graph_html = pio.to_html(fig, include_plotlyjs='cdn', full_html=False)
 
     return graph_html
@@ -61,7 +73,7 @@ def get_cache_filepath(query: str) -> str:
     query_hash = hashlib.md5(str.lower(query).encode('utf-8')).hexdigest()
     return os.path.join(CACHE_DIR, f"{query_hash}.json")
 
-def load_cached_dataframe(query: str):
+def load_cached_dataframe(query: str, metadata_cls):
     """
     Load a cached dataframe
 
@@ -87,7 +99,7 @@ def load_cached_dataframe(query: str):
         json_data = json.load(f)
 
     df = pd.DataFrame(json_data['data'])
-    metadata = GraphMetadata.from_dict(json_data['metadata'])
+    metadata = metadata_cls.from_dict(json_data['metadata'])
     
     print('loaded cached df')
 

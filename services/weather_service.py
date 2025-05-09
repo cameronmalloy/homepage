@@ -75,7 +75,8 @@ def construct_weather_dataframe(city_name):
         title = f'{city}, {state} - {country}',
         x_axis = 'time',
         y_axis = 'temperature_2m',
-        num_points = 24
+        num_points = 24,
+        show_x_grid = False
     )
     return weather_data, metadata
 

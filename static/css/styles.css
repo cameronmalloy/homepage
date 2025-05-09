@@ -1,11 +1,11 @@
 body {
-    background-color: #151629;
-    background-image:
-      radial-gradient(circle at 60% 20%, rgba(255, 150, 50, 0.15) 0%, transparent 60%), /* orange */
+    background-color: #ffffff;
+    /* background-image:
+      radial-gradient(circle at 60% 20%, rgba(255, 150, 50, 0.15) 0%, transparent 30%), 
       radial-gradient(circle at 30% 10%, rgba(148, 87, 235, 0.15) 0%, transparent 40%),
       radial-gradient(circle at 80% 30%, rgba(255, 99, 177, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(59, 73, 255, 0.08) 0%, transparent 60%);
-    color: #f1f1f1;
+      radial-gradient(circle at 50% 50%, rgba(59, 73, 255, 0.08) 0%, transparent 60%); */
+    color: #000000;
     font-family: sans-serif;
     margin: 0;
     padding: 0;
@@ -15,7 +15,6 @@ body {
 .center-container {
     display: flex;
     justify-content: center;
-    align-items: center;
     height: 100vh;
 }
 
@@ -28,6 +27,12 @@ body {
     gap: 2rem;
 }
 
+.module-area {
+    margin-top: 5rem; /* This should match or exceed the height of your fixed search bar */
+    padding: 1rem 1.5rem;
+    justify-content: center;
+  }
+
 .search-wrapper {
     width: 80%; /* or 90% if you prefer */
     max-width: 800px;
@@ -38,42 +43,41 @@ body {
 }
   
 .search-bar {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #ffffff;
+    border: 1px solid #ccc;
     border-radius: 12px;
     backdrop-filter: blur(8px);
     padding: 1rem 1.5rem;
     display: flex;
     gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     position: fixed;  /* Fixed to the top of the screen */
     top: 1rem;           /* Stick to the top */
     left: 50%;        /* Center horizontally */
     transform: translateX(-50%); /* Perfect centering */
-    width: 80%;       /* Adjust width here to 80% or 90% */
+    width: 75%;       /* Adjust width here to 80% or 90% */
     z-index: 1000;    /* Ensure it stays above other content */
 }
   
 .search-bar:focus-within {
-    box-shadow: 0 4px 20px rgba(155, 135, 245, 0.2);
-    border-color: rgba(155, 135, 245, 0.3);
+    box-shadow: 0 4px 20px rgba(255, 165, 0, 0.3); /* orange shadow */
+    border-color: rgba(255, 165, 0, 0.6);          /* orange border */
 }
 
 .search-bar input {
     background: transparent;
     border: none;
-    color: white;
+    color: #000;
     outline: none;
     font-size: 1rem;
     flex: 1;
 }
 
 .search-bar input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: bold;
-    font-size: 1.1rem;
-    text-align: center;
+    color: #a6a6a6;
+    font-size: 0.75rem;
+    text-align: left;
 }
   
 .search-bar input:focus::placeholder {
@@ -83,7 +87,7 @@ body {
 .search-bar button {
     background: none;
     border: none;
-    color: white;
+    color: #000;
     font-weight: bold;
     cursor: pointer;
 }
@@ -91,11 +95,16 @@ body {
   
 .card {
     margin-bottom: 20px;
-}
-pre {
     background-color: #f8f9fa;
     padding: 10px;
     border-radius: 4px;
+    color: #000;
+}
+pre {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 4px;
+    color: #000
 }
 .search-container {
     margin-bottom: 30px;
@@ -103,9 +112,9 @@ pre {
 .content-area {
     min-height: 400px;
 }
-.chart-container {
+.graph-container {
     position: relative;
-    height: 400px;
+    /* height: 400px; */
 }
 .pagination-controls {
     text-align: center;

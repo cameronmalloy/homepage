@@ -1,13 +1,13 @@
 from flask import Blueprint, render_template, request
 from services.graph_service import generate_paginated_graphs, save_dataframe_cache, load_cached_dataframe
-from services.graph_metadata import GraphMetadata
 from services.weather_service import construct_weather_dataframe
+from services.graph_metadata import WeatherGraphMetadata
 import pandas as pd
 
 graph_bp = Blueprint('graph_bp', __name__, url_prefix='/graph')
 
-def get_cached_df_and_metadata_or_generate(key, construct_method):
-    df, metadata = load_cached_dataframe(key)
+def get_cached_df_and_metadata_or_generate(key, construct_method, metadata_cls):
+    df, metadata = load_cached_dataframe(key, metadata_cls)
     if df is None:
         df, metadata = construct_method(key)
         save_dataframe_cache(key, df, metadata)
@@ -24,7 +24,7 @@ def create_weather_graph():
     print('creating weather graph')
 
     # df, metadata = construct_weather_dataframe(city)
-    df, metadata = get_cached_df_and_metadata_or_generate(city, construct_weather_dataframe)
+    df, metadata = get_cached_df_and_metadata_or_generate(city, construct_weather_dataframe, WeatherGraphMetadata)
     metadata.y_axis = metric
     total_pages = (len(df) + metadata.num_points - 1) // metadata.num_points
     graph_html = generate_paginated_graphs(df, metadata, page)
